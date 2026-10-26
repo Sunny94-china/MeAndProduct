@@ -1,0 +1,59 @@
+:root {
+  --mp-primary: #4f46e5;
+  --mp-bg: #f4f6fb;
+  --mp-text: #0f172a;
+  --mp-border: #e8edf5;
+  --mp-pad: 16px;
+}
+
+html,
+body,
+#app {
+  min-height: 100%;
+  background: var(--mp-bg);
+  color: var(--mp-text);
+  font-family: "PingFang SC", "Hiragino Sans GB", "Noto Sans SC",
+    "Microsoft YaHei", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  margin: 0;
+}
+
+.el-main {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: var(--mp-pad) !important;
+}
+
+.el-main .el-table {
+  min-width: 720px;
+}
+
+.bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.bar .spacer {
+  flex: 1;
+}
+
+@media (max-width: 768px) {
+  :root {
+    --mp-pad: 12px;
+  }
+
+  .bar .el-input,
+  .bar .el-select {
+    width: 100% !important;
+    max-width: 100%;
+  }
+
+  .bar .spacer {
+    display: none;
+  }
+}

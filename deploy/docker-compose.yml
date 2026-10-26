@@ -1,0 +1,3 @@
+# 生产编排在仓库根目录 docker-compose.yml。
+# 运维说明：docs/deploy.md
+# 服务器：gzip -dc meandproduct-*-web.tar.gz | docker load && docker compose up -d

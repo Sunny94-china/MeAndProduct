@@ -1,0 +1,73 @@
+name: meandproduct
+
+# 服务器一键运行（无源码、无 build）：
+#   cp .env.example .env && 编辑配置
+#   gzip -dc meandproduct-*-web.tar.gz | docker load
+#   docker compose up -d
+# 完整说明见 docs/deploy.md
+#
+# 三个业务容器；MySQL / Redis / Nginx 使用服务器已有实例。
+# 默认平台 linux/amd64（与常见 x86_64 服务器对齐）。
+
+services:
+  backend:
+    image: ${BACKEND_IMAGE:-meandproduct-backend:latest}
+    platform: linux/amd64
+    container_name: meandproduct-backend
+    restart: unless-stopped
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    environment:
+      TZ: Asia/Shanghai
+      APP_ENV: production
+      SERVER_PORT: "8080"
+      MYSQL_HOST: ${MYSQL_HOST:-host.docker.internal}
+      MYSQL_PORT: ${MYSQL_PORT:-3306}
+      MYSQL_USER: ${MYSQL_USER:-meandproduct}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-change_me_app_pwd_456}
+      MYSQL_DB: ${MYSQL_DB:-meandproduct}
+      MYSQL_MIGRATE_AUTO: "true"
+      REDIS_ADDR: ${REDIS_ADDR:-host.docker.internal:6379}
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-}
+      REDIS_DB: ${REDIS_DB:-11}
+      JWT_SECRET: ${JWT_SECRET:-please_change_me_to_a_long_random_string_at_least_32_chars}
+      JWT_BLACKLIST_PREFIX: ${JWT_BLACKLIST_PREFIX:-mp:jwt:blacklist:}
+      CORS_ALLOW_ORIGINS: ${CORS_ALLOW_ORIGINS:-*}
+      ADMIN_USERNAME: ${ADMIN_USERNAME:-admin}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@local}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-Admin@123}
+    ports:
+      - "127.0.0.1:${API_PORT:-18080}:8080"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:8080/api/v1/health"]
+      interval: 8s
+      timeout: 5s
+      retries: 15
+      start_period: 25s
+    networks:
+      - meandproduct-net
+
+  public:
+    image: ${PUBLIC_IMAGE:-meandproduct-public:latest}
+    platform: linux/amd64
+    container_name: meandproduct-public
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${PUBLIC_PORT:-18081}:80"
+    networks:
+      - meandproduct-net
+
+  admin:
+    image: ${ADMIN_IMAGE:-meandproduct-admin:latest}
+    platform: linux/amd64
+    container_name: meandproduct-admin
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${ADMIN_PORT:-18082}:80"
+    networks:
+      - meandproduct-net
+
+networks:
+  meandproduct-net:
+    name: meandproduct-net
+    driver: bridge

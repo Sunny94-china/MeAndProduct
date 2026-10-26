@@ -1,0 +1,23 @@
+# 仅在有源码的构建机使用。服务器部署包不要带这个文件。
+# 默认打 linux/amd64，与常见服务器一致（Apple Silicon 本机也要指定该平台）。
+#
+#   make pack TAG=v1.0.0
+#   # 或
+#   DOCKER_DEFAULT_PLATFORM=linux/amd64 \
+#     docker compose -f docker-compose.yml -f docker-compose.build.yml build
+
+services:
+  backend:
+    platform: linux/amd64
+    build: ./backend
+    image: ${BACKEND_IMAGE:-meandproduct-backend:latest}
+
+  public:
+    platform: linux/amd64
+    build: ./frontend/public-site
+    image: ${PUBLIC_IMAGE:-meandproduct-public:latest}
+
+  admin:
+    platform: linux/amd64
+    build: ./frontend/admin-dashboard
+    image: ${ADMIN_IMAGE:-meandproduct-admin:latest}
